@@ -1,67 +1,104 @@
-from csv import *
-import numpy as np
-import matplotlib.pyplot as plt
+import csv
+from tkinter import filedialog
+from tkinter import *
+from tkinter import messagebox
 
-## matrix structure ##
-##              0    1    2
-##              good soso bad
-## 0 = index[0] 5    7    8
-## 1 = index[1] 3    2    10
-## 2 = index[2] 4    2    32
-## 3 = index[3] 3    12   1
-## 
+filedir = ""
+songDictionary = {}
 
+#frame change
+def openFrame(frame):
+    frame.tkraise()
+    
+#loading csv file
+def fileSelection():
+    global filedir
+    filePath = filedialog.askopenfilename(title="파일을 선택하세요",filetypes=[("csv files", "*.csv")])
+    if filePath:
+        global numberOfPeople
+        filedir = f"{filePath}"
+        openFrame(mainFrame)
+        with open(filedir, 'r',encoding="utf-8") as w:
+            lines = w.readlines()
+            numberOfPeople = len(lines)-1
+            createLabels()
+    else:
+        messagebox.showwarning("오류", "파일을 선택하세요.")
 
-plt.rcParams['font.family'] ='AppleGothic'
-plt.rcParams['axes.unicode_minus'] =False
-
-def transpose(m):
-    row = len(m)
-    col = len(m[0])
-    mt = [[0]*row for i in range(col)]
-    for i in range(row):
-        for j in range(col):
-            mt[j][i] = m[i][j]
-    return(mt)
-
-
-with open("선곡.csv", 'r', encoding="utf-8") as work:
-    rdr = reader(work)
-    for i, line in enumerate(rdr):
+def createLabels():
+    global label0
+    for i in range(0,((numberOfPeople)//2)+1):
         if i == 0:
-            index = line[2:]
-            numberofRow = len(line)
-            m = [[0,0,0] for i in range(numberofRow-2)]
+            label0 = Label(mainFrame, text="모두가 동의 한 곡:",font=("Arial", 20))
+            label0.place(relx=0.5,rely=0, anchor="n")
         else:
-            for j, word in enumerate(line):
-                if j == 0 or j ==  1:
+            globals()[f"label{i}"] = Label(mainFrame,text=f"{i}명 빼고 동의한 곡:", font=("Arial", 20))
+            globals()[f"label{i}"].place(relx=0.5,rely=i/(((numberOfPeople)//2)+2), anchor="n")
+    mainFrame.update_idletasks()
+    sorting()
+
+
+def sorting():
+    global songDictionary
+    # CSV 파일을 열고 DictReader를 사용하여 읽기
+    with open(filedir, newline='') as work:
+        content = csv.DictReader(work)
+        #songDictionary Emptying
+        for songs in content:
+            for i, song in enumerate(songs.keys()):
+                if i == 0 or i == 1:
                     continue
-                assert word != '', "입력되지 않은 항목이 존재합니다"
+                songDictionary[song] = list()
 
-                if word == 'good':
-                    m[j-2][0] += 1
-                elif word == 'soso':
-                    m[j-2][1] += 1
-                elif word == 'bad':
-                    m[j-2][2] += 1
-    mTransed = transpose(m)
+    with open(filedir, newline='') as work:
+        content = csv.DictReader(work)
+        #songDictionary making
+        for songs in content:
+            for i, song in enumerate(songs.keys()):
+                if i == 0 or i == 1:
+                    continue
+                songDictionary[song].append(songs[song])
 
-y = np.arange(len(index))  # 레이블 위치
-width = 0.25  # 막대의 너비
+        #agreeList making
+        for i in range(0,(numberOfPeople//2)+1):
+            globals()[f"agree{i}List"] = list()
+            for song in songDictionary.keys():
+                if songDictionary[song].count("good") == numberOfPeople-i:
+                    globals()[f"agree{i}List"].append(song)
+            
 
-# 막대 그래프 그리기
-fig, ax = plt.subplots()
-rects1 = ax.barh(y + width, mTransed[0], width, label='good', color='green')
-rects2 = ax.barh(y, mTransed[1], width, label='soso',color='orange')
-rects3 = ax.barh(y - width, mTransed[2], width, label='bad',color='red')
+        #label attaching
+        for j in range(0,(numberOfPeople//2)+1):
+            for i, song in enumerate(globals()[f"agree{j}List"], start=1):
+                    label = Label(mainFrame, text = song, font=("Arial", 13))
+                    if j == 0:
+                        label.place(relx=0.5,rely= (label0.winfo_y()+(label1.winfo_y() - label0.winfo_y())*(i/(len(globals()[f"agree{j}List"])+1))) / mainFrame.winfo_height(), anchor="n")
+                    elif j == (numberOfPeople//2):
+                        label.place(relx=0.5,rely=(globals()[f"label{j}"].winfo_y()+float((1 - (mainFrame.winfo_height())*globals()[f"label{j}"].winfo_y())*(i/(len(globals()[f"agree{j}List"])+1)))) / mainFrame.winfo_height(), anchor="n")
+                    else:
+                        label.place(relx=0.5,rely=(globals()[f"label{j}"].winfo_y()+float((globals()[f"label{j+1}"].winfo_y() - globals()[f"label{j}"].winfo_y())*(i/(len(globals()[f"agree{j}List"])+1)))) / mainFrame.winfo_height(), anchor="n")
 
-# 그래프 제목 및 라벨 설정
-ax.set_title('선곡 결과')
-ax.set_ylabel('노래')
-ax.set_xlabel('Values')
-ax.set_yticks(y)
-ax.set_yticklabels(index)
-ax.legend()
 
-# 그래프 표시
-plt.show()
+#fundametal settings
+window = Tk()
+window.title("선곡")
+window.geometry("1200x700")
+
+#main frame
+mainFrame = Frame(window)
+mainFrame.place(x=0,y=0, relheight=1,relwidth=1)
+
+
+
+#csv selection frame
+previousFrame = Frame(window)
+previousFrame.place(x=0,y=0, relheight=1,relwidth=1)
+inform = Label(previousFrame, text="csv파일을 선택하세요", font=("Arial", 20))
+inform.place(relx=0.5,rely=0.4,anchor="center")
+csvSeletion = Button(previousFrame,text="선택", command= fileSelection)
+csvSeletion.place(relx=0.5,rely=0.5,anchor="center")
+
+openFrame(previousFrame)
+window.mainloop()
+
+
