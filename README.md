@@ -9,6 +9,12 @@
        soso
        bad
 
+    ex)
+    Q: Eagles - Hotel California
+    A: good
+       soso
+       bad
+
 2. 설문조사가 완료되면 응답패널에서 응답 다운로드(.csv) 버튼을 통해 csv파일을 다운로드 해주세요.
 3. 프로그램을 켜서 csv파일을 불러와주세요. 
 4. 결과가 표시 될 것입니다.
