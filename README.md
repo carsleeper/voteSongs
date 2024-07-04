@@ -3,12 +3,13 @@
 #################     사용법     ###################
 
 1.구글폼에서 다음과 같은 형식으로 설문조사를 만들어 주세요. (응답 항목의 이름을 무조건 good, soso, bad 로 지어야 합니다.)
-Q: songname1
-A: good
-   soso
-   bad
-Q: songname2
-A: good
+
+    Q: songname1
+    A: good
+       soso
+       bad
+    Q: songname2
+    A: good
        soso
        bad
     Q: songname3
