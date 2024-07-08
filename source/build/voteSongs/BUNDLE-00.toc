@@ -1,0 +1,3 @@
+([('voteSongs',
+   '/Users/pc/Documents/myProject/voteSongs/source/dist/voteSongs',
+   'EXECUTABLE')],)
