@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtCore import QCoreApplication
 import sys
 import csv
 ## 구상 : 설정창에서 기타세션 최소 충족 인원 수 등등을 정할 수 있게 하고,
@@ -104,7 +105,9 @@ class voteSongs(QMainWindow):
             if self.fname[0]:
                 break
             else:
-                QMessageBox.question(self, 'Error','please choose file.', QMessageBox.Yes, QMessageBox.Yes)
+                ans = QMessageBox.question(self, 'Error','please choose file.', QMessageBox.Cancel | QMessageBox.Yes, QMessageBox.Yes)
+                if ans == QMessageBox.Cancel:
+                    sys.exit()
         self.sorting()
 
     # loadFileBox < loadFileGroupbox < windowPage
