@@ -12,6 +12,7 @@ class voteSongs(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle('voteSongs')
+        self.setWindowIcon(QIcon('vote.png'))
         self.resize(700,400)
         #open window at center
         qr = self.frameGeometry()
